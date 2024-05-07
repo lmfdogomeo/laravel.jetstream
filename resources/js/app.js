@@ -5,8 +5,19 @@ import { createApp, h } from 'vue';
 import { createInertiaApp } from '@inertiajs/vue3';
 import { resolvePageComponent } from 'laravel-vite-plugin/inertia-helpers';
 import { ZiggyVue } from '../../vendor/tightenco/ziggy';
+import axios from 'axios';
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
+
+const token = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('XSRF-TOKEN='))
+    .split('=')[1];
+
+axios.defaults.baseURL = import.meta.env.APP_URL;
+// axios.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+// axios.defaults.headers.common['X-XSRF-TOKEN'] = `${token}`;
+// axios.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 createInertiaApp({
     title: (title) => `${title} - ${appName}`,

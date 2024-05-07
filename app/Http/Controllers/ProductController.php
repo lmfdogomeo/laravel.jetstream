@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Product;
 use Exception;
 use Illuminate\Http\Request;
+use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends Controller
@@ -18,7 +19,12 @@ class ProductController extends Controller
 
         $products = Product::where("merchant_id", $request->merchant_id)->paginate($size);
 
-        return response()->json($products);
+        // return response()->json($products);
+
+        return Inertia::render('Product', [
+            'table' => $products,
+            'merchant_id' => $request->merchant_uuid
+        ]);
     }
 
     /**
@@ -29,7 +35,7 @@ class ProductController extends Controller
         $request->validate([
             "product_name" => "required|string|max:255",
             "product_description" => "required|string",
-            "price" => "required|decimal:2,10",
+            "price" => "required|decimal:2",
             "quantity" => "required|int",
         ]);
 
@@ -42,14 +48,19 @@ class ProductController extends Controller
         ]);
 
         if ($product->save()) {
-            return response()->json([
-                'status' => 'Success',
-                'message' => 'Successfully save',
-                "data" => $product
-            ]);
+            // return response()->json([
+            //     'status' => 'Success',
+            //     'message' => 'Successfully save',
+            //     "data" => $product
+            // ]);
+
+            return redirect()->back()
+                ->with('code', '200')
+                ->with('status', 'success')
+                ->with('message', 'Product submitted successfully!');
         }
 
-        throw new Exception("Failed to add record", Response::HTTP_UNPROCESSABLE_ENTITY);
+        // throw new Exception("Failed to add record", Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     /**
@@ -81,7 +92,7 @@ class ProductController extends Controller
         $request->validate([
             "product_name" => "required|string|max:255",
             "product_description" => "required|string",
-            "price" => "required|decimal:2,10",
+            "price" => "required|decimal:1,2",
             "quantity" => "required|int",
         ]);
 
@@ -102,11 +113,16 @@ class ProductController extends Controller
         ]);
 
         if ($product->save()) {
-            return response()->json([
-                'status' => 'Success',
-                'message' => 'Successfully updated',
-                "data" => $product
-            ]);
+            // return response()->json([
+            //     'status' => 'Success',
+            //     'message' => 'Successfully updated',
+            //     "data" => $product
+            // ]);
+
+            return redirect()->back()
+                ->with('code', '200')
+                ->with('status', 'success')
+                ->with('message', "Product updated successfully!");
         }
 
         throw new Exception("Failed to update data", Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -123,10 +139,15 @@ class ProductController extends Controller
         ])->first();
 
         if ($product && $product->delete()) {
-            return response()->json([
-                'status' => 'Success',
-                'message' => 'Product has been deleted',
-            ]);
+            // return response()->json([
+            //     'status' => 'Success',
+            //     'message' => 'Product has been deleted',
+            // ]);
+
+            return redirect()->back()
+                ->with('code', '200')
+                ->with('status', 'success')
+                ->with('message', "Product deleted successfully!");
         }
 
         throw new Exception("Unable to delete data", Response::HTTP_UNPROCESSABLE_ENTITY);

@@ -19,7 +19,7 @@ return new class extends Migration
             $table->double("price", [10, 2]);
             $table->integer("quantity");
             $table->bigInteger("merchant_id")->index()->unsigned();
-            $table->foreign("merchant_id")->references("id")->on("merchants");
+            $table->foreign("merchant_id")->references("id")->on("merchants")->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();
         });
     }

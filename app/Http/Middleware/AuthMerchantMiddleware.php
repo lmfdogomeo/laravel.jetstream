@@ -19,6 +19,6 @@ class AuthMerchantMiddleware
             return $next($request);
         }
 
-        return response()->json(['status' => "Unauthorized", "message" => "You are not authorized"]);
+        return response()->json(['status' => "Unauthorized", "message" => "You are not authorized"], Response::HTTP_UNAUTHORIZED);
     }
 }

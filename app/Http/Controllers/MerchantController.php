@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\MerchantResource;
 use App\Models\Merchant;
+use App\Services\ApiResponser\Facades\ApiResponser;
 use Exception;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
+use Inertia\Inertia;
 use Symfony\Component\HttpFoundation\Response;
 
 class MerchantController extends Controller
@@ -18,7 +22,9 @@ class MerchantController extends Controller
 
         $merchants = Merchant::paginate($size);
 
-        return response()->json($merchants);
+        return Inertia::render("Merchant", [
+            'table' => $merchants
+        ]);
     }
 
     /**
@@ -41,14 +47,22 @@ class MerchantController extends Controller
         ]);
 
         if ($merchant->save()) {
-            return response()->json([
-                'status' => 'Success',
-                'message' => 'Successfully save',
-                "data" => $merchant
-            ]);
+            // return ApiResponser::successWithResource(MerchantResource::class, $merchant, "Successfully save");
+            
+            // return response()->json([
+            //     'status' => 'Success',
+            //     'message' => 'Successfully save',
+            //     "data" => $merchant
+            // ], Response::HTTP_OK);
+
+            // return to_route('merchant');
+            return redirect()->back()
+                ->with('code', '200')
+                ->with('status', 'success')
+                ->with('message', 'Form submitted successfully!');
         }
 
-        throw new Exception("Failed to add record", Response::HTTP_UNPROCESSABLE_ENTITY);
+        // throw new Exception("Failed to add record", Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     /**
@@ -56,19 +70,26 @@ class MerchantController extends Controller
      */
     public function show(string $uuid)
     {
-        $merchant = Merchant::where([
+        $merchant = Merchant::withCount('products')->where([
             "uuid" => $uuid
         ])->first();
 
         if ($merchant) {
-            return response()->json([
-                'status' => 'Success',
-                'message' => 'Successfully fetch',
-                "data" => $merchant
+            // return ApiResponser::successWithResource(MerchantResource::class, $merchant, "Successfully fetch");
+            // return response()->json([
+            //     'status' => 'Success',
+            //     'message' => 'Successfully fetch',
+            //     "data" => $merchant
+            // ]);
+
+            return Inertia::render("MerchantInfo", [
+                'merchant' => $merchant
             ]);
         }
 
-        throw new Exception("No record found", Response::HTTP_NOT_FOUND);
+        return abort(404);
+
+        // throw new Exception("No record found", Response::HTTP_NOT_FOUND);
     }
 
     /**
@@ -99,11 +120,17 @@ class MerchantController extends Controller
         ]);
 
         if ($merchant->save()) {
-            return response()->json([
-                'status' => 'Success',
-                'message' => 'Successfully updated',
-                "data" => $merchant
-            ]);
+            // return ApiResponser::successWithResource(MerchantResource::class, $merchant, "Successfully updated");
+            // return response()->json([
+            //     'status' => 'Success',
+            //     'message' => 'Successfully updated',
+            //     "data" => $merchant
+            // ]);
+
+            return redirect()->back()
+                ->with('code', '200')
+                ->with('status', 'success')
+                ->with('message', "Merchant updated successfully!");
         }
 
         throw new Exception("Failed to update data", Response::HTTP_UNPROCESSABLE_ENTITY);
@@ -119,12 +146,20 @@ class MerchantController extends Controller
         ])->first();
 
         if ($merchant && $merchant->delete()) {
-            return response()->json([
-                'status' => 'Success',
-                'message' => 'Record has been deleted',
-            ]);
+            // return response()->json([
+            //     'status' => 'Success',
+            //     'message' => 'Merchant has been deleted',
+            //     'data' => $merchant
+            // ]);
+
+            return to_route("merchant.get")
+                ->with('code', '200')
+                ->with('status', 'success')
+                ->with('message', "Merchant deleted successfully!");
         }
 
-        throw new Exception("Unable to delete data", Response::HTTP_UNPROCESSABLE_ENTITY);
+        // throw new Exception("Unable to delete data", Response::HTTP_UNPROCESSABLE_ENTITY);
+
+        // return abort(404);
     }
 }

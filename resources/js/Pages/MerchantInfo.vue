@@ -5,8 +5,11 @@ import MerchantDialog from '@/Pages/Merchant/MerchantDialog.vue';
 import { ref, watch } from 'vue';
 import SimpleAlertMessage from "@/Components/SimpleAlertMessage.vue";
 import MerchantTable from './Merchant/MerchantTable.vue';
+import { router, usePage } from '@inertiajs/vue3';
+import MerchantInfo from "@/Pages/Merchant/MerchantInfo.vue";
 
 const merchantDialogRef = ref(null);
+const page = usePage();
 
 const handleShowCreateMerchantForm = (merchant = null) => {
     merchantDialogRef.value?.handleShowDialog(merchant);
@@ -18,29 +21,21 @@ const handleShowCreateMerchantForm = (merchant = null) => {
     <AppLayout title="Merchant">
         <template #header>
             <h2 class="text-xl font-semibold leading-tight text-gray-800">
-                Merchant
+                Merchant Information
+                <p class="text-sm font-normal">Ref: {{ page.props.merchant?.uuid }}</p>
             </h2>
 
             <PrimaryButton
-                    class="ms-3"
-                    @click="handleShowCreateMerchantForm(null)"
-                >
-                Add Merchant
+                class="ms-3"
+                @click="router.get(route('merchant.get'))"
+            >
+                Back
             </PrimaryButton>
         </template>
 
         <div class="py-12">
             <div class="mx-auto max-w-7xl sm:px-6 lg:px-8">
-                
-                <SimpleAlertMessage />
-
-                <div class="overflow-hidden bg-white shadow-xl sm:rounded-lg">
-                    <div class="py-10 mx-auto max-w-7xl sm:px-6 lg:px-8">
-                        <MerchantDialog ref="merchantDialogRef" />
-
-                        <MerchantTable :onSelectItem="handleShowCreateMerchantForm" />
-                    </div>
-                </div>
+                <MerchantInfo />
             </div>
         </div>
     </AppLayout>
