@@ -21,12 +21,6 @@ const form = useForm({
 });
 
 const handleSubmitMerchant = async () => {
-    // try {
-    //     const response = await axios.post(route('merchant.create'), form.data());
-    //     console.log('form', response)
-    // } catch (error) {
-    //     console.log('error', error)
-    // }
     if (props.data?.uuid) {
         form.put(route('merchant.update', {uuid: props.data?.uuid}), {
             preserveScroll: true,

@@ -1,13 +1,14 @@
 <script setup>
-import { onMounted, ref, watch } from 'vue';
+import { ref, watch } from 'vue';
 import { usePage, router, useForm } from '@inertiajs/vue3';
 import ActionMessage from '@/Components/ActionMessage.vue';
 import FormSection from '@/Components/FormSection.vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import MerchantForm from './MerchantForm.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
-import DangerButton from '@/Components/DangerButton.vue';
 import ConfirmDialog from '@/Components/ConfirmDialog.vue';
+import ConfirmationModal from '@/Components/ConfirmationModal.vue';
+import DangerButton from '@/Components/DangerButton.vue';
+import SecondaryButton from '@/Components/SecondaryButton.vue';
 
 const page = usePage();
 const props = defineProps({
@@ -19,12 +20,10 @@ const props = defineProps({
 const form = useForm({});
 const processing = ref(false);
 const merchantForm = ref(null);
-const isSuccess = ref(false);
 const responseMessage = ref("");
 const showConfirmationDialog = ref(false);
 
 const handleUpdateMerchant = () => {
-    console.log("error submission")
     merchantForm.value?.handleSubmitMerchant();
 }
 
@@ -44,7 +43,6 @@ const showResponseMessage = () => {
 
 const onConfirmDeletion = () => {
     showConfirmationDialog.value = false;
-    console.log('onConfirmDeletion')
     form.delete(route('merchant.delete', { uuid: page.props.merchant.uuid }), {
         onSuccess: () => {
             // 
@@ -58,10 +56,6 @@ const handleDeleteMerchant = () => {
 
 watch(() => page.props.flash.message, (newValue) => {
     showResponseMessage();
-})
-
-onMounted(() => {
-    console.log('info', page.props.merchant)
 })
 
 </script>
@@ -135,11 +129,36 @@ onMounted(() => {
         </template>
     </FormSection>
 
-    <ConfirmDialog 
+    <ConfirmationModal :show="showConfirmationDialog" @close="showConfirmationDialog = false">
+        <template #title>
+            Delete Merchant Data
+        </template>
+
+        <template #content>
+            {{ page.props.merchant.products_count > 0 ? `There are ${page.props.merchant.products_count} products listed in this merchant. Are you sure you want to delete this?` : 'Are you sure you want to delete this merchant?' }}
+        </template>
+
+        <template #footer>
+            <SecondaryButton @click="showConfirmationDialog = false">
+                Cancel
+            </SecondaryButton>
+
+            <DangerButton
+                class="ms-3"
+                :class="{ 'opacity-25': form.processing }"
+                :disabled="form.processing"
+                @click="onConfirmDeletion"
+            >
+                Delete
+            </DangerButton>
+        </template>
+    </ConfirmationModal>
+
+    <!-- <ConfirmDialog 
         title="Confirmation"
         :message="`${page.props.merchant.products_count > 0 ? `There are ${page.props.merchant.products_count} products listed in this merchant. Are you sure you want to delete this?` : 'Are you sure you want to delete this merchant?'}`"
         :onConfirm="onConfirmDeletion"
         :onCancel="() => showConfirmationDialog = false"
         :show="showConfirmationDialog"
-    />
+    /> -->
 </template>

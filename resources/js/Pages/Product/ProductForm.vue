@@ -23,6 +23,8 @@ const form = useForm({
 });
 
 const handleSubmitProduct = async () => {
+    form.price = form.price ? Number(form.price).toFixed(2) : form.price;
+
     if (props.data?.uuid) {
         form.put(route('product.update', { merchant_uuid: page.props.merchant_id, uuid: props.data?.uuid }), {
             preserveScroll: true,
@@ -64,7 +66,7 @@ defineExpose({
 onMounted(() => {
     form.product_name = props.data?.product_name || "";
     form.product_description = props.data?.product_description || "";
-    form.price = props.data?.price.toString() || "";
+    form.price = props.data?.price?.toFixed(2).toString() || "";
     form.quantity = props.data?.quantity.toString() || "";
 })
 

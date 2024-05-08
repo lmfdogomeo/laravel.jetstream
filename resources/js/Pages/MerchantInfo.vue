@@ -1,19 +1,11 @@
 <script setup>
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
-import MerchantDialog from '@/Pages/Merchant/MerchantDialog.vue';
-import { ref, watch } from 'vue';
-import SimpleAlertMessage from "@/Components/SimpleAlertMessage.vue";
-import MerchantTable from './Merchant/MerchantTable.vue';
+import { ref } from 'vue';
 import { router, usePage } from '@inertiajs/vue3';
 import MerchantInfo from "@/Pages/Merchant/MerchantInfo.vue";
 
-const merchantDialogRef = ref(null);
 const page = usePage();
-
-const handleShowCreateMerchantForm = (merchant = null) => {
-    merchantDialogRef.value?.handleShowDialog(merchant);
-}
 
 </script>
 

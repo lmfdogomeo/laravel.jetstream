@@ -2,7 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Product;
+use App\Http\Requests\Product\ProductRequest;
+use App\Repositories\Contracts\ProductRepositoryInterface;
 use Exception;
 use Illuminate\Http\Request;
 use Inertia\Inertia;
@@ -10,6 +11,11 @@ use Symfony\Component\HttpFoundation\Response;
 
 class ProductController extends Controller
 {
+    public function __construct(protected readonly ProductRepositoryInterface $repository)
+    {
+        
+    }
+
     /**
      * Display a listing of the resource.
      */
@@ -17,9 +23,7 @@ class ProductController extends Controller
     {
         $size = $request->size ?? 5;
 
-        $products = Product::where("merchant_id", $request->merchant_id)->paginate($size);
-
-        // return response()->json($products);
+        $products = $this->repository->paginate($size, ['merchant_id' => $request->merchant_id]);
 
         return Inertia::render('Product', [
             'table' => $products,
@@ -30,37 +34,17 @@ class ProductController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(ProductRequest $request)
     {
-        $request->validate([
-            "product_name" => "required|string|max:255",
-            "product_description" => "required|string",
-            "price" => "required|decimal:2",
-            "quantity" => "required|int",
-        ]);
-
-        $product = new Product([
-            "product_name" => $request->product_name,
-            "product_description" => $request->product_description,
-            "price" => $request->price,
-            "quantity" => $request->quantity,
-            "merchant_id" => $request->merchant_id
-        ]);
+        $product = $this->repository->create($request->parameters());
 
         if ($product->save()) {
-            // return response()->json([
-            //     'status' => 'Success',
-            //     'message' => 'Successfully save',
-            //     "data" => $product
-            // ]);
 
             return redirect()->back()
                 ->with('code', '200')
                 ->with('status', 'success')
                 ->with('message', 'Product submitted successfully!');
         }
-
-        // throw new Exception("Failed to add record", Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     /**
@@ -68,64 +52,26 @@ class ProductController extends Controller
      */
     public function show(Request $request, string $merchant_id, string $uuid)
     {
-        $product = Product::with("merchant")->where([
-            "uuid" => $uuid,
-            "merchant_id" => $request->merchant_id
-        ])->first();
-
-        if ($product) {
-            return response()->json([
-                'status' => 'Success',
-                'message' => 'Successfully fetch',
-                "data" => $product,
-            ]);
-        }
-
-        throw new Exception("No record found", Response::HTTP_NOT_FOUND);
+        
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $merchant_id, string $uuid)
+    public function update(ProductRequest $request, string $merchant_id, string $uuid)
     {
-        $request->validate([
-            "product_name" => "required|string|max:255",
-            "product_description" => "required|string",
-            "price" => "required|decimal:1,2",
-            "quantity" => "required|int",
-        ]);
 
-        $product = Product::where([
-            "uuid" => $uuid,
-            "merchant_id" => $request->merchant_id
-        ])->first();
+        $product = $this->repository->update($uuid, $request->parameters(), ['uuid' => $uuid, 'merchant_id' => $request->merchant_id]);
 
         if (!$product) {
-            throw new Exception("Unable to update data", Response::HTTP_UNPROCESSABLE_ENTITY);
+            throw new Exception("Unable to update data" .  $request->merchant_id, Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        $product->update([
-            "product_name" => $request->product_name,
-            "product_description" => $request->product_description,
-            "price" => $request->price,
-            "quantity" => $request->quantity,
-        ]);
-
-        if ($product->save()) {
-            // return response()->json([
-            //     'status' => 'Success',
-            //     'message' => 'Successfully updated',
-            //     "data" => $product
-            // ]);
-
-            return redirect()->back()
-                ->with('code', '200')
-                ->with('status', 'success')
-                ->with('message', "Product updated successfully!");
-        }
-
-        throw new Exception("Failed to update data", Response::HTTP_UNPROCESSABLE_ENTITY);
+        return redirect()->back()
+            ->with('code', '200')
+            ->with('status', 'success')
+            ->with('message', "Product updated successfully!");
+    
     }
 
     /**
@@ -133,23 +79,16 @@ class ProductController extends Controller
      */
     public function destroy(Request $request, string $merchant_id, string $uuid)
     {
-        $product = Product::where([
+
+        $this->repository->delete($uuid, [
             "uuid" => $uuid,
             "merchant_id" => $request->merchant_id
-        ])->first();
+        ]);
 
-        if ($product && $product->delete()) {
-            // return response()->json([
-            //     'status' => 'Success',
-            //     'message' => 'Product has been deleted',
-            // ]);
-
-            return redirect()->back()
-                ->with('code', '200')
-                ->with('status', 'success')
-                ->with('message', "Product deleted successfully!");
-        }
-
-        throw new Exception("Unable to delete data", Response::HTTP_UNPROCESSABLE_ENTITY);
+        return redirect()->back()
+            ->with('code', '200')
+            ->with('status', 'success')
+            ->with('message', "Product deleted successfully!");
+        
     }
 }

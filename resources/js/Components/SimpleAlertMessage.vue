@@ -3,11 +3,9 @@ import { usePage } from '@inertiajs/vue3';
 import { onMounted, ref, watch } from 'vue';
 
 const page = usePage();
-
 const showAlert = ref(false);
 
 watch(() => page.props.flash?.message, (newValue) => {
-    console.log('ddddd', newValue)
     if (newValue) {
         showAlert.value = true;
     } else {

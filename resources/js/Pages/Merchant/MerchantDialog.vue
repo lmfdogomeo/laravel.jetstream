@@ -18,13 +18,10 @@ const handleSubmitMerchant = async () => {
 const handleShowDialog = (merchant) => {
     if (merchant) {
         merchantId.value = merchant.uuid;
-
         merchantData.value = merchant;
     }
     else {
-        // merchantForm.value?.resetForm();
         merchantId.value = null;
-
         merchantData.value = null;
     }
     

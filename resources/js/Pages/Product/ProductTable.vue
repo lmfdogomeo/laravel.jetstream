@@ -61,7 +61,7 @@ const tables = computed(() => {
                     {{ product.product_description || "-" }}
                 </td>
                 <td class="px-6 py-4">
-                    {{ product.price || "0.00" }}
+                    {{ product.price ? product.price.toFixed(2) : "0.00" }}
                 </td>
                 <td class="px-6 py-4">
                     {{ product.quantity || "0" }}

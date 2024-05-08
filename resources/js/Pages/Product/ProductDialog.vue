@@ -8,6 +8,7 @@ import DangerButton from '@/Components/DangerButton.vue';
 import ConfirmDialog from "@/Components/ConfirmDialog.vue";
 import { useForm, usePage } from '@inertiajs/vue3';
 import ActionMessage from '@/Components/ActionMessage.vue';
+import ConfirmationModal from '@/Components/ConfirmationModal.vue';
 
 const page = usePage();
 const productForm = ref(null);
@@ -27,13 +28,10 @@ const handleSubmitProduct = async () => {
 const handleShowDialog = (product) => {
     if (product) {
         productId.value = product.uuid;
-
         productData.value = product;
     }
     else {
-        // productForm.value?.resetForm();
         productId.value = null;
-
         productData.value = null;
     }
     
@@ -41,12 +39,6 @@ const handleShowDialog = (product) => {
 }
 
 const onSuccess = (type = "") => {
-    // showProductDialog.value = false;
-    // productId.value = null;
-    // productData.value = null;
-
-    console.log('type', type)
-
     if (type === "create") {
         showProductDialog.value = false;
         productData.value = null;
@@ -68,7 +60,6 @@ const showResponseMessage = () => {
 
 const onConfirmDeletion = () => {
     showConfirmationDialog.value = false;
-    console.log('onConfirmDeletion')
     form.delete(route('product.delete', { merchant_uuid: page.props.merchant_id, uuid: productId.value }), {
         onSuccess: () => {
             showProductDialog.value = false;
@@ -103,7 +94,9 @@ defineExpose({
             <ActionMessage :on="responseMessage ? true : false" class="flex items-center me-3">
                 <span class="sr-only">Info</span> {{ responseMessage }}
             </ActionMessage>
-            <DangerButton class="ms-3 float-start" @click="showConfirmationDialog = true">
+            <DangerButton class="ms-3 float-start" @click="showConfirmationDialog = true"
+                v-if="productId"
+            >
                 Delete
             </DangerButton>
 
@@ -122,11 +115,28 @@ defineExpose({
         </template>
     </DialogModal>
 
-    <ConfirmDialog 
-        title="Confirmation"
-        message="Are you sure you want to delete this product?"
-        :onConfirm="onConfirmDeletion"
-        :onCancel="() => showConfirmationDialog = false"
-        :show="showConfirmationDialog"
-    />
+    <ConfirmationModal :show="showConfirmationDialog" @close="showConfirmationDialog = false">
+        <template #title>
+            Delete Product
+        </template>
+
+        <template #content>
+            Are you sure you want to delete this product?
+        </template>
+
+        <template #footer>
+            <SecondaryButton @click="showConfirmationDialog = false">
+                Cancel
+            </SecondaryButton>
+
+            <DangerButton
+                class="ms-3"
+                :class="{ 'opacity-25': form.processing }"
+                :disabled="form.processing"
+                @click="onConfirmDeletion"
+            >
+                Delete
+            </DangerButton>
+        </template>
+    </ConfirmationModal>
 </template>
