@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Api\Merchant\CreateMerchantController;
+use App\Http\Controllers\Api\Merchant\GetMerchantController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\MerchantController;
 use App\Http\Controllers\ProductController;
 use Illuminate\Http\Request;
@@ -20,22 +23,24 @@ use Illuminate\Support\Facades\Route;
 //     return $request->user();
 // });
 
-Route::middleware(["auth:sanctum"])->group(function() {
-    // Route::group(["prefix" => "merchants"], function () {
-    //     Route::middleware(["admin"])->group(function() {
-    //         Route::get("", [MerchantController::class, "index"])->name("merchant.get");
-    //         Route::post("", [MerchantController::class, "store"])->name("merchant.create");
-    //         Route::put("{uuid}", [MerchantController::class, "update"])->name("merchant.update");
-    //         Route::delete("{uuid}", [MerchantController::class, "destroy"])->name("merchant.delete");
-    //         Route::get("{uuid}", [MerchantController::class, "show"])->name("merchant.select");
-    //     });
+Route::post("/auth/login", [AuthController::class, 'login'])->name("api.auth.login");
 
-    //     Route::group(["middleware" => "validmerchantuuid", "prefix" => "{merchant_uuid}/products"], function() {
-    //         Route::get("", [ProductController::class, "index"])->name("product.get");
-    //         Route::post("", [ProductController::class, "store"])->name("product.create");
-    //         Route::put("{uuid}", [ProductController::class, "update"])->name("product.update");
-    //         Route::delete("{uuid}", [ProductController::class, "destroy"])->name("product.delete");
-    //         Route::get("{uuid}", [ProductController::class, "show"])->name("product.select");
-    //     });
-    // });
+Route::middleware(["auth:sanctum"])->group(function() {
+    Route::group(["prefix" => "merchants"], function () {
+        Route::middleware(["admin"])->group(function() {
+            Route::get("", GetMerchantController::class)->name("api.merchant.get");
+            Route::post("", CreateMerchantController::class)->name("api.merchant.create");
+            // Route::put("{uuid}", [MerchantController::class, "update"])->name("api.merchant.update");
+            // Route::delete("{uuid}", [MerchantController::class, "destroy"])->name("api.merchant.delete");
+            // Route::get("{uuid}", [MerchantController::class, "show"])->name("api.merchant.select");
+        });
+
+        // Route::group(["middleware" => "validmerchantuuid", "prefix" => "{merchant_uuid}/products"], function() {
+        //     Route::get("", [ProductController::class, "index"])->name("product.get");
+        //     Route::post("", [ProductController::class, "store"])->name("product.create");
+        //     Route::put("{uuid}", [ProductController::class, "update"])->name("product.update");
+        //     Route::delete("{uuid}", [ProductController::class, "destroy"])->name("product.delete");
+        //     Route::get("{uuid}", [ProductController::class, "show"])->name("product.select");
+        // });
+    });
 });
