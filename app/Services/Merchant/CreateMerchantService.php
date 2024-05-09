@@ -4,6 +4,7 @@ namespace App\Services\Merchant;
 
 use App\Http\Requests\Contracts\RequestContract;
 use App\Http\Resources\MerchantResource;
+use App\Models\Merchant;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -15,5 +16,12 @@ class CreateMerchantService extends BaseMerchantService
         $merchant->refresh();
 
         return new MerchantResource($merchant);
+    }
+
+    public function mapMerchantProduct()
+    {
+        return [
+            'balance' => 200
+        ];
     }
 }

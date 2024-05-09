@@ -11,6 +11,8 @@ class Merchant extends Model
     use HasFactory;
     use HasUuid;
 
+    protected $guarded = ['id'];
+
     protected $fillable = [
         "uuid",
         "company_name",

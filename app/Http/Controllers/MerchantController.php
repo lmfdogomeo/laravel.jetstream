@@ -36,16 +36,13 @@ class MerchantController extends Controller
     public function store(MerchantRequest $request)
     {
 
-        $merchant = $this->repository->create($request->parameters());
+        $this->repository->create($request->parameters());
 
-        if ($merchant->save()) {
-            return redirect()->back()
-                ->with('code', '200')
-                ->with('status', 'success')
-                ->with('message', 'Form submitted successfully!');
-        }
+        return redirect()->back()
+            ->with('code', '200')
+            ->with('status', 'success')
+            ->with('message', 'Form submitted successfully!');
 
-        // throw new Exception("Failed to add record", Response::HTTP_UNPROCESSABLE_ENTITY);
     }
 
     /**

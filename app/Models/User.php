@@ -4,6 +4,7 @@ namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 
+use App\Enums\UserRoles;
 use App\Traits\HasUuid;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -54,6 +55,7 @@ class User extends Authenticatable
      */
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'role' => UserRoles::class
     ];
 
     /**
@@ -69,12 +71,14 @@ class User extends Authenticatable
         return in_array($this->role, $roles);
     }
 
-    public function isAdmin() {
-        return $this->role === "admin";
+    public function isAdmin(): bool 
+    {
+        return $this->role->is(UserRoles::ADMIN);
     }
 
-    public function isMerchant() {
-        return $this->role === "merchant";
+    public function isMerchant(): bool
+    {
+        return $this->role->is(UserRoles::MERCHANT);
     }
 
     public function merchantUser() {
