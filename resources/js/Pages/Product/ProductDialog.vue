@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
 import DialogModal from '@/Components/DialogModal.vue';
@@ -68,6 +68,10 @@ const onConfirmDeletion = () => {
     })
 }
 
+const userRole = computed(() => {
+    return page.props.auth.user?.role || "";
+})
+
 watch(() => page.props.flash.message, (newValue) => {
     showResponseMessage();
 })
@@ -81,7 +85,7 @@ defineExpose({
 <template>
     <DialogModal :show="showProductDialog" @close="showProductDialog = false">
         <template #title>
-            {{ productId ? "Update" : "Create" }} Product
+            {{ userRole === 'merchant' ? 'Product Information' : `${productId ? "Update Product" : "Create Product"}` }}
         </template>
 
         <template #content>
@@ -95,13 +99,13 @@ defineExpose({
                 <span class="sr-only">Info</span> {{ responseMessage }}
             </ActionMessage>
             <DangerButton class="ms-3 float-start" @click="showConfirmationDialog = true"
-                v-if="productId"
+                v-if="productId && userRole === 'admin'"
             >
                 Delete
             </DangerButton>
 
             <SecondaryButton class="ms-3" @click="showProductDialog = false">
-                Cancel
+                {{ userRole === 'admin' ? 'Cancel' : 'Close' }}
             </SecondaryButton>
 
             <PrimaryButton
@@ -109,6 +113,7 @@ defineExpose({
                 :class="{ 'opacity-25': processing }"
                 :disabled="processing"
                 @click="handleSubmitProduct"
+                v-if="userRole === 'admin'"
             >
                 {{ productId ? "Update" : "Save" }}
             </PrimaryButton>

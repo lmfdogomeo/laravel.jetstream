@@ -12,14 +12,14 @@ interface RepositoryInterface
 
     public function all(): Collection;
 
-    public function find(string|int $id): Model;
+    public function find(int $id): Model;
 
-    public function findByUuid(string $uuid, array $relationships = [], array $withCounts = []): Model;
+    public function findByUuid(string $uuid, array $relationships): Model;
 
     public function create(array $data): Model;
 
-    public function update(string|int $id, array $data, array $filters = []): bool;
+    public function update(int $id, array $data, array $filters = []): bool;
 
-    public function delete(string|int $id): Model;
+    public function delete(int $id): Model;
 
 }

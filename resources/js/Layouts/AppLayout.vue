@@ -1,12 +1,14 @@
 <script setup>
-import { ref } from 'vue';
-import { Head, Link, router } from '@inertiajs/vue3';
+import { ref, computed } from 'vue';
+import { Head, Link, router, usePage } from '@inertiajs/vue3';
 import ApplicationMark from '@/Components/ApplicationMark.vue';
 import Banner from '@/Components/Banner.vue';
 import Dropdown from '@/Components/Dropdown.vue';
 import DropdownLink from '@/Components/DropdownLink.vue';
 import NavLink from '@/Components/NavLink.vue';
 import ResponsiveNavLink from '@/Components/ResponsiveNavLink.vue';
+
+const page = usePage();
 
 defineProps({
     title: String,
@@ -25,6 +27,15 @@ const switchToTeam = (team) => {
 const logout = () => {
     router.post(route('logout'));
 };
+
+const userRole = computed(() => {
+    return page.props.auth.user?.role || "";
+})
+
+const userUuid = computed(() => {
+    return page.props.auth.user?.uuid || "";
+})
+
 </script>
 
 <template>
@@ -52,13 +63,17 @@ const logout = () => {
                                     Dashboard
                                 </NavLink>
 
-                                <NavLink :href="route('merchant.get')" :active="route().current('merchant.get') || route().current('merchant.select')">
+                                <NavLink :href="route('merchant.get')" :active="route().current('merchant.get') || route().current('merchant.select')"
+                                    v-if="userRole === 'admin'"
+                                >
                                     Merchant
                                 </NavLink>
 
-                                <!-- <NavLink :href="route('product.get')" :active="route().current('product.get') || route().current('product.select')">
+                                <NavLink :href="route('product.get', { merchant_uuid: userUuid })" :active="route().current('product.get') || route().current('product.select')"
+                                    v-if="userRole === 'merchant'"
+                                >
                                     Product
-                                </NavLink> -->
+                                </NavLink>
                             </div>
                         </div>
 
@@ -150,7 +165,7 @@ const logout = () => {
                                             Profile
                                         </DropdownLink>
 
-                                        <DropdownLink v-if="$page.props.jetstream.hasApiFeatures" :href="route('api-tokens.index')">
+                                        <DropdownLink v-if="$page.props.jetstream.hasApiFeatures && $page.props?.auth?.user?.role === 'admin'" :href="route('api-tokens.index')">
                                             API Tokens
                                         </DropdownLink>
 

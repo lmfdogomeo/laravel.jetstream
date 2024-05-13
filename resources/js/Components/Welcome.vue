@@ -1,5 +1,21 @@
 <script setup>
 import ApplicationLogo from "@/Components/ApplicationLogo.vue";
+import { usePage } from "@inertiajs/vue3";
+import { computed, onMounted } from "vue";
+
+const page = usePage();
+
+const userRole = computed(() => {
+    return page.props.auth.user?.role || "";
+})
+
+const userUuid = computed(() => {
+    return page.props.auth.user?.uuid || "";
+})
+
+onMounted(() => {
+    console.log('page', page.props.auth.user)
+})
 </script>
 
 <template>
@@ -8,6 +24,7 @@ import ApplicationLogo from "@/Components/ApplicationLogo.vue";
             <a
                 :href="route('merchant.get')"
                 class="scale-100 p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500"
+                v-if="userRole === 'admin'"
             >
                 <div>
                     <div
@@ -57,7 +74,7 @@ import ApplicationLogo from "@/Components/ApplicationLogo.vue";
             </a>
 
             <a
-            :href="'#'"
+            :href="userRole === 'merchant' ? route('product.get', { merchant_uuid: userUuid }) : '#'"
                 class="scale-100 p-6 bg-white dark:bg-gray-800/50 dark:bg-gradient-to-bl from-gray-700/50 via-transparent dark:ring-1 dark:ring-inset dark:ring-white/5 rounded-lg shadow-2xl shadow-gray-500/20 dark:shadow-none flex motion-safe:hover:scale-[1.01] transition-all duration-250 focus:outline focus:outline-2 focus:outline-red-500"
             >
                 <div>

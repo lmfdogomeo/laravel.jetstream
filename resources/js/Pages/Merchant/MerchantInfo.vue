@@ -9,6 +9,8 @@ import ConfirmDialog from '@/Components/ConfirmDialog.vue';
 import ConfirmationModal from '@/Components/ConfirmationModal.vue';
 import DangerButton from '@/Components/DangerButton.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
+import MerchantAccountForm from './MerchantAccountForm.vue';
+import FloatAlertMessage from '@/Components/FloatAlertMessage.vue';
 
 const page = usePage();
 const props = defineProps({
@@ -20,8 +22,8 @@ const props = defineProps({
 const form = useForm({});
 const processing = ref(false);
 const merchantForm = ref(null);
-const responseMessage = ref("");
 const showConfirmationDialog = ref(false);
+const showAlertMessage = ref(false);
 
 const handleUpdateMerchant = () => {
     merchantForm.value?.handleSubmitMerchant();
@@ -32,20 +34,14 @@ const onSuccess = () => {
 }
 
 const showResponseMessage = () => {
-    if (page.props.flash.message) {
-        responseMessage.value = page.props.flash.message;
-
-        setTimeout(() => {
-            responseMessage.value = "";
-        }, 2000);
-    }
+    showAlertMessage.value = true;
 }
 
 const onConfirmDeletion = () => {
     showConfirmationDialog.value = false;
     form.delete(route('merchant.delete', { uuid: page.props.merchant.uuid }), {
         onSuccess: () => {
-            // 
+            showAlertMessage.value = true;
         }
     })
 }
@@ -54,13 +50,15 @@ const handleDeleteMerchant = () => {
     showConfirmationDialog.value = true;
 }
 
-watch(() => page.props.flash.message, (newValue) => {
-    showResponseMessage();
-})
-
 </script>
 
 <template>
+    <FloatAlertMessage
+        v-model="showAlertMessage"
+        :message="page.props.flash.message"
+        :timeout="2000"
+    />
+
    <FormSection @submitted="handleUpdateMerchant">
         <template #title>
             Merchant Information
@@ -69,7 +67,7 @@ watch(() => page.props.flash.message, (newValue) => {
         <template #description>
             Update merchant information and manage products
 
-            <div class="mt-[50px]">
+            <div class="mt-[20px]">
                 <div
                     id="alert-additional-content-3"
                     class="p-4 mb-4 text-green-800 border border-green-300 rounded-lg bg-green-50 dark:bg-gray-800 dark:text-green-400 dark:border-green-800"
@@ -106,6 +104,16 @@ watch(() => page.props.flash.message, (newValue) => {
                     </div>
                 </div>
             </div>
+
+            <!-- <div class="px-4 py-5 bg-white shadow sm:p-6 sm:rounded-tl-md sm:rounded-tr-md"> -->
+            <div class="mt-[20px]">
+                <h3 class="text-lg font-medium text-gray-900 mb-[15px]">
+                    Account Information
+                </h3>
+                <MerchantAccountForm 
+                    :merchantUuid="page.props.merchant.uuid"
+                />
+            </div>
         </template>
 
         <template #form>
@@ -113,10 +121,6 @@ watch(() => page.props.flash.message, (newValue) => {
         </template>
 
         <template #actions>
-            <ActionMessage :on="responseMessage ? true : false" class="flex items-center me-3">
-                <span class="sr-only">Info</span> {{ responseMessage }}
-            </ActionMessage>
-
             <DangerButton class="ms-3" type="button" :class="{ 'opacity-25': processing }" :disabled="processing"
                 @click.stop="handleDeleteMerchant"
             >

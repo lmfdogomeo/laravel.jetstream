@@ -2,7 +2,7 @@
 import PrimaryButton from '@/Components/PrimaryButton.vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import ProductDialog from '@/Pages/Product/ProductDialog.vue';
-import { ref, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import SimpleAlertMessage from "@/Components/SimpleAlertMessage.vue";
 import ProductTable from './Product/ProductTable.vue';
 import SecondaryButton from '@/Components/SecondaryButton.vue';
@@ -13,6 +13,10 @@ const page = usePage();
 const handleShowCreateProductForm = (Product = null) => {
     productDialogRef.value?.handleShowDialog(Product);
 }
+
+const userRole = computed(() => {
+    return page.props.auth.user?.role || "";
+})
 
 </script>
 
@@ -27,6 +31,7 @@ const handleShowCreateProductForm = (Product = null) => {
                 <SecondaryButton
                     class="ms-3"
                     @click="router.get(route('merchant.select', { uuid: page.props.merchant_id }))"
+                    v-if="userRole === 'admin'"
                 >
                     Back
                 </SecondaryButton>
@@ -34,6 +39,7 @@ const handleShowCreateProductForm = (Product = null) => {
                 <PrimaryButton
                     class="ms-3"
                     @click="handleShowCreateProductForm(null)"
+                    v-if="userRole === 'admin'"
                 >
                     Add Product
                 </PrimaryButton>

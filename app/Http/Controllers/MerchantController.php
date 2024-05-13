@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Enums\UserRoles;
 use App\Http\Requests\Merchant\MerchantRequest;
+use App\Http\Requests\Merchant\MerchantUserRequest;
 use App\Repositories\Contracts\MerchantRepositoryInterface;
 use Exception;
 use Illuminate\Http\Request;
@@ -50,7 +52,7 @@ class MerchantController extends Controller
      */
     public function show(string $uuid)
     {
-        $merchant = $this->repository->findByUuid($uuid, [], ['products']);
+        $merchant = $this->repository->findByUuid($uuid, ['merchantUser', 'merchantUser.user'], ['products']);
 
         if ($merchant) {
             return Inertia::render("MerchantInfo", [
@@ -94,5 +96,34 @@ class MerchantController extends Controller
             ->with('code', '200')
             ->with('status', 'success')
             ->with('message', "Merchant deleted successfully!");
+    }
+
+    /**
+     * Register and link merchant to user account
+     */
+    public function register(MerchantUserRequest $request, string $uuid)
+    {
+        $merchant = $this->repository->findByUuid($uuid );
+
+        $data = array_merge($request->parameters(), ['merchant_id' => $merchant->id, 'role' => UserRoles::MERCHANT]);
+
+        $registered = $this->repository->register($data);
+
+        return redirect()->back()
+            ->with('code', '200')
+            ->with('status', 'success')
+            ->with('message', "Merchant account successfully saved!");
+    }
+
+    /**
+     * Reset password merchant account
+     */
+    public function resetPassword(Request $request)
+    {
+
+        return redirect()->back()
+            ->with('code', '200')
+            ->with('status', 'success')
+            ->with('message', "Merchant account password successfully reset!");
     }
 }

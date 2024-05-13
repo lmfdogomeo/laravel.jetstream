@@ -51,7 +51,7 @@ Before you begin the installation process, make sure you have the following soft
 
     composer require <dependency>
 
-    #
+    # or
 
     composer dump-autoload
     ```
@@ -63,6 +63,8 @@ Before you begin the installation process, make sure you have the following soft
     #or
 
     php artisan serve --port=5001
+  
+    # just ignore this command when you are using Herd
     ```
 
 - To create user using command
@@ -72,6 +74,10 @@ Before you begin the installation process, make sure you have the following soft
     # example
 
     php artisan app:create-user "Super Admin" "admin@test.com" "password"
+  
+    # or
+    
+    php artisan make:user
     ```
 
 

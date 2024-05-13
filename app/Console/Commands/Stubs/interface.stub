@@ -1,0 +1,11 @@
+<?php
+
+namespace {{ NAMESPACE }};
+
+use App\Repositories\Contracts\PaginateRepositoryInterface;
+use App\Repositories\Contracts\RepositoryInterface;
+
+interface {{ INTERFACE_NAME }} extends RepositoryInterface, PaginateRepositoryInterface
+{
+	//
+}

@@ -1,0 +1,61 @@
+<?php
+
+namespace {{ NAMESPACE }};
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Contracts\Database\Eloquent\Builder;
+use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Support\Collection;
+use App\Repositories\BaseRepository;
+use {{ USE_INTERFACE }};
+use {{ MODEL_NAMESPACE }};
+
+class {{ CLASS_NAME }} extends BaseRepository implements {{ IMPLEMENTED_INTERFACE }}
+{
+    public function query(): Builder
+    {
+        return {{ MODEL_CLASS_NAME }}::query();
+    }
+
+    public function all(): Collection
+    {
+        return $this->query()->get();
+    }
+
+    public function create(array $data): Model
+    {
+        return $this->query()->create($data);
+    }
+
+    public function find(int $id): Model
+    {
+        return $this->query()->findOrFail($id);
+    }
+
+    public function findByUuid(string $uuid, array $relationships = []): Model
+    {
+        return $this->query()->with($relationships)->where("uuid", $uuid)->firstOrFail();
+    }
+
+    public function update(int $id, array $data, array $filters = []): bool
+    {
+        $model = $this->find($id);
+
+        return $model->update($data);
+    }
+
+    public function paginate(int $size, array $filters = []): Paginator
+    {
+        return $this->query()
+            ->paginate($size);
+    }
+
+    public function delete($id): Model
+	{
+        $model = $this->find($id);
+
+		$model->delete();
+
+		return $model;
+    }
+}

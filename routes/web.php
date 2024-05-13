@@ -50,6 +50,7 @@ Route::middleware([
             Route::put("{uuid}", [MerchantController::class, "update"])->name("merchant.update");
             Route::delete("{uuid}", [MerchantController::class, "destroy"])->name("merchant.delete");
             Route::get("{uuid}", [MerchantController::class, "show"])->name("merchant.select");
+            Route::post("{uuid}/register", [MerchantController::class, "register"])->name("merchant.register");
         });
 
         Route::group(["middleware" => "validmerchantuuid", "prefix" => "{merchant_uuid}/products"], function() {

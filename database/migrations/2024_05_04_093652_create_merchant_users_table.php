@@ -16,8 +16,8 @@ return new class extends Migration
             $table->uuid("uuid")->unique();
             $table->bigInteger("user_id")->index()->unsigned();
             $table->bigInteger("merchant_id")->index()->unsigned();
-            $table->foreign("user_id")->references("id")->on("users");
-            $table->foreign("merchant_id")->references("id")->on("merchants");
+            $table->foreign("user_id")->references("id")->on("users")->cascadeOnDelete()->cascadeOnUpdate();
+            $table->foreign("merchant_id")->references("id")->on("merchants")->cascadeOnDelete()->cascadeOnUpdate();
             $table->timestamps();
         });
     }

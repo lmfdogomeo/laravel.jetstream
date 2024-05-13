@@ -1,5 +1,5 @@
 <script setup>
-import { onMounted, watch } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { useForm, usePage } from '@inertiajs/vue3';
 import InputError from '@/Components/InputError.vue';
 import InputLabel from '@/Components/InputLabel.vue';
@@ -58,6 +58,10 @@ const onSuccessFormSubmission = (type = "create") => {
     }
 }
 
+const userRole = computed(() => {
+    return page.props.auth.user?.role || "";
+})
+
 defineExpose({
     resetForm,
     handleSubmitProduct
@@ -99,6 +103,7 @@ onMounted(() => {
             class="block w-full mt-1"
             required
             autocomplete="product-name"
+            :disabled="userRole === 'merchant'"
         />
         <InputError :message="form.errors.product_name" class="mt-2" />
     </div>
@@ -113,6 +118,7 @@ onMounted(() => {
             required
             autocomplete="description"
             rows="5"
+            :disabled="userRole === 'merchant'"
         />
         <InputError :message="form.errors.product_description" class="mt-2" />
     </div>
@@ -127,6 +133,7 @@ onMounted(() => {
             class="block w-full mt-1"
             required
             autocomplete="price"
+            :disabled="userRole === 'merchant'"
         />
         <InputError :message="form.errors.price" class="mt-2" />
     </div>
@@ -141,6 +148,7 @@ onMounted(() => {
             class="block w-full mt-1"
             required
             autocomplete="quantity"
+            :disabled="userRole === 'merchant'"
         />
         <InputError :message="form.errors.quantity" class="mt-2" />
     </div>

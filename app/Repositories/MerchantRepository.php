@@ -1,14 +1,19 @@
-<?php 
+<?php
 
 
 namespace App\Repositories;
 
 use App\Models\Merchant;
+use App\Models\MerchantUser;
+use App\Models\User;
 use App\Repositories\Contracts\MerchantRepositoryInterface;
+use Exception;
+use GuzzleHttp\Psr7\Request;
 use Illuminate\Contracts\Database\Eloquent\Builder;
 use Illuminate\Contracts\Pagination\Paginator;
-use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\DB;
 
 class MerchantRepository implements MerchantRepositoryInterface
 {
@@ -39,7 +44,7 @@ class MerchantRepository implements MerchantRepositoryInterface
     }
 
     public function update(string|int $id, array $data, array $filters = []): bool
-    {   
+    {
         if (is_int($id)) {
             $model = $this->find($id);
         }
@@ -68,5 +73,40 @@ class MerchantRepository implements MerchantRepositoryInterface
 		$model->delete();
 
 		return $model;
+    }
+
+    public function register(mixed $data): Model
+    {
+        DB::beginTransaction();
+        try {
+            $user = User::where("email", $data['email'])->first();
+
+            if ($user) {
+                $user->name = $data['name'];
+
+                if (!empty($data['password'])) {
+                    $user->password = $data['password'];
+                }
+                
+                $user->save();
+
+                $merchantUser = $user->merchantUser;
+            }
+            else {
+                $user = User::create($data);
+
+                $merchantUser = MerchantUser::create([
+                    'user_id' => $user->id,
+                    'merchant_id' => $data['merchant_id']
+                ]);
+            }
+
+            DB::commit();
+
+            return $merchantUser;
+        } catch (Exception $e) {
+            DB::rollBack();
+            throw new Exception($e);
+        } 
     }
 }

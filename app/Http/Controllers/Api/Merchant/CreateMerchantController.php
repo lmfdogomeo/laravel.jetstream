@@ -19,6 +19,7 @@ class CreateMerchantController extends ServiceController
      */
     public function __invoke(CreateMerchantRequest $request): JsonResource | JsonResponse
     {
-        return ApiResponser::successWithResource(MerchantResource::class, parent::handle($request), "Merchant create successfully", Response::HTTP_CREATED);
+        return ApiResponser::success("Merchant create successfully", parent::handle($request), Response::HTTP_CREATED);
+        // success(string $message = null, array $data = [], int $customCode = Response::HTTP_OK, int $code = Response::HTTP_OK): JsonResponse
     }
 }

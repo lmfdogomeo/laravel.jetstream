@@ -21,8 +21,13 @@ class AuthAdminMiddleware
             return $next($request);
         }
 
-        return response()->json(['status' => "Unauthorized", "message" => $request->user()->isAdmin()], 500);
-
         return $request->expectsJson() ? response()->json(['status' => "Unauthorized", "message" => "You are not authorized"], Response::HTTP_UNAUTHORIZED) : abort(Response::HTTP_UNAUTHORIZED);
+    
+        // return $request->expectsJson() ? response()->json([
+        //     'status' => "Unauthorized", 
+        //     "message" => "You are not authorized", 
+        //     'user' => $request->user(), 'auth' => Auth::user()->permissions()
+        // ], Response::HTTP_UNAUTHORIZED) : abort(Response::HTTP_UNAUTHORIZED);
+    
     }
 }
